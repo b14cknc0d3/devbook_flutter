@@ -27,8 +27,9 @@ class CreateRoomController extends GetxController {
         documentId: room.toMap()['room_id'],
         data: room.toMap(),
         // read: ['user:$friendId', 'user:$userId'],
-        read: ['user:$userId'],
-        write: ['user:$userId'],
+        //TODO: changed role to from cloud function
+        read: ['role:member'],
+        write: ['role:member'],
         // write: ['role:member']
       );
       Map<String, dynamic> data = x.data;

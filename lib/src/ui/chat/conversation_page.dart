@@ -12,17 +12,21 @@ class ConversationPage extends StatelessWidget {
   final Profile friendProfile;
   final Profile myProfile;
   final Room room;
+  final ChatController chatController = Get.find<ChatController>();
   ConversationPage({
     Key? key,
     required this.friendProfile,
     required this.myProfile,
     required this.room,
-  }) : super(key: key);
-  // final Message? message = Get.arguments;
-  final ChatController chatController = Get.find<ChatController>();
+  }) : super(key: key) {
+    chatController.getMessageByRoom(room.roomId);
+  }
+
   @override
   Widget build(BuildContext context) {
-    chatController.getMessageByRoom(room.roomId);
+    chatController.subscription = chatController.getChatStreamByRoom(room);
+
+    // chatController.getMessageByRoom(room.roomId);
     // String friName = message?.fromUser ?? 'User';
 
     // x.getMessageByRoom(message!.roomId);
@@ -63,7 +67,9 @@ class ConversationPage extends StatelessWidget {
           children: [
             Expanded(child: Obx(() {
               return ListView.separated(
-                separatorBuilder: (context, index) => const Padding(
+                reverse: true,
+                controller: chatController.scrollController,
+                separatorBuilder: (context, i) => const Padding(
                   padding: EdgeInsets.only(left: 64.0),
                   child: Divider(
                     color: Colors.transparent,
@@ -71,9 +77,11 @@ class ConversationPage extends StatelessWidget {
                   ),
                 ),
                 itemCount: chatController.conversationListRx.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (context, i) {
+                  final reversedIndex =
+                      chatController.conversationListRx.length - 1 - i;
                   final Message message =
-                      chatController.conversationListRx[index];
+                      chatController.conversationListRx[reversedIndex];
 
                   if (message.fromUser == myProfile.id) {
                     return SendMessageWidget(
@@ -89,44 +97,50 @@ class ConversationPage extends StatelessWidget {
                 },
               );
             })),
-            SizedBox(
-              height: 50,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: chatController.messageController,
-                      // onChanged: (value) {
-                      //   chatController.messageController;
-                      // },
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message',
-                        border: InputBorder.none,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 50,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: chatController.messageController,
+                        // onChanged: (value) {
+                        //   chatController.messageController;
+                        // },
+                        decoration: InputDecoration(
+                          hintText: 'Type a message',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: () {
-                      if (chatController.messageController.text.isNotEmpty) {
-                        print("""
+                    IconButton(
+                      color: Colors.indigo,
+                      icon: const Icon(Icons.send),
+                      onPressed: () {
+                        if (chatController.messageController.text.isNotEmpty) {
+                          print("""
  fromUser: ${myProfile.$id.toString()},
-                            toUser: ${friendProfile.$id.toString()},
+                              toUser: ${friendProfile.$id.toString()},
 """);
-                        Message message = Message(
-                            fromUser: myProfile.user!.id.toString(),
-                            toUser: friendProfile.user!.id.toString(),
-                            message: chatController.messageController.text,
-                            createdAt: DateTime.now(),
-                            updatedAt: DateTime.now(),
-                            roomId: room.roomId);
+                          Message message = Message(
+                              fromUser: myProfile.user!.id.toString(),
+                              toUser: friendProfile.user!.id.toString(),
+                              message: chatController.messageController.text,
+                              createdAt: DateTime.now(),
+                              updatedAt: DateTime.now(),
+                              roomId: room.roomId);
 
-                        chatController.sendToConversation(message);
-                        chatController.messageController.clear();
-                      }
-                    },
-                  ),
-                ],
+                          chatController.sendToConversation(message);
+                          chatController.messageController.clear();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

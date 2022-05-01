@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
@@ -12,22 +13,28 @@ import 'package:get/get.dart';
 
 class ChatController extends GetxController {
   final TextEditingController messageController = TextEditingController();
+  final ScrollController scrollController =
+      ScrollController(initialScrollOffset: 0);
   final User? user = Get.find<AuthController>().user;
   final AppWriteClientController appWriteClientController =
       Get.find<AppWriteClientController>();
-  final AuthController _authController = Get.find<AuthController>();
 
   final RxList<Message> _conversationListRx = RxList<Message>();
   List<Message> get conversationListRx => _conversationListRx;
-
+  set conversationListRx(List<Message> value) =>
+      _conversationListRx.value = value;
   final RxList<Room> _roomList = RxList<Room>();
   List<Room> get roomList => _roomList;
   set roomList(List<Room> value) => _roomList.value = value;
-  // @override
-  // onInit() {
-  //   super.onInit();
 
-  // }
+  StreamSubscription? subscription;
+
+  @override
+  onClose() {
+    subscription?.cancel();
+    super.onClose();
+    _conversationListRx.clear();
+  }
 
   Future<List<Room>> getRoomList() async {
     try {
@@ -64,20 +71,32 @@ class ChatController extends GetxController {
     }
   }
 
-  Stream<Message> getChatStreamByRoom(Room room) {
+  StreamSubscription getChatStreamByRoom(Room room) {
     return appWriteClientController.realtime!
-        .subscribe([
-          "collections.${AppConstant.messagsCollectionId}.documents.${room.roomId}"
-        ])
+        .subscribe(["collections.${AppConstant.messagsCollectionId}.documents"])
         .stream
-        .map((event) {
+        // .map((event) {
+        //   Message x = Message.fromMap(event.payload);
+        //   return x;
+        // });
+        .listen((event) {
+          print(event.toMap());
           Message x = Message.fromMap(event.payload);
-          return x;
+          if (x.roomId == room.roomId) {
+            log("[TOTAL_MESSAGE] =>  ${_conversationListRx.length}");
+            if (conversationListRx.isNotEmpty) {
+              if (conversationListRx.last.$id != x.$id) {
+                _conversationListRx.add(x);
+              }
+            }
+          }
+
+          // _conversationListRx.add(x);
+        }, onError: (e) {
+          print(e);
+        }, onDone: () {
+          print("done");
         });
-    // .listen((event) {
-    //   Message x = Message.fromMap(event.payload);
-    //   _conversationListRx.add(x);
-    // });
   }
 
   // createTestChat() {
@@ -118,14 +137,16 @@ class ChatController extends GetxController {
           ),
         ],
         orderAttributes: ['createdAt'],
-        orderTypes: ['ASC'],
+        orderTypes: ['DESC'],
       );
 
       final data = response.toMap();
       final documents = data['documents'].toList();
-      _conversationListRx.value = documents
+      log("[TOTAL_MESSAGE -future-] =>  ${documents.length}  ${data['total']}");
+      List<Message> x = documents
           .map<Message>((Map<String, dynamic> e) => Message.fromMap(e['data']))
           .toList();
+      conversationListRx = x.reversed.toList();
       return conversationListRx;
     } catch (e) {
       throw Exception(e);
@@ -158,7 +179,18 @@ class ChatController extends GetxController {
           // 'user:${message.toUser.toString()}'
         ],
       );
-      getMessageByRoom(message.roomId);
+      print('updating.... room');
+      await appWriteClientController.database!.updateDocument(
+        collectionId: AppConstant.roomCollectionId,
+        documentId: message.roomId,
+        data: {
+          'last_message': message.message.length > 255
+              ? message.message.substring(0, 255)
+              : message.message,
+          'updatedAt': DateTime.now().toIso8601String(),
+        },
+      );
+      // getMessageByRoom(message.roomId);
       print(response);
     } on AppwriteException catch (e) {
       throw Exception(e);
@@ -170,11 +202,4 @@ class ChatController extends GetxController {
 //     collectionId: AppConstant.messagsCollectionId,
 //   );
 // }
-}
-
-extension Iterables<E> on Iterable<E> {
-  Map<K, List<E>> groupBy<K>(K Function(E) keyFunction) => fold(
-      <K, List<E>>{},
-      (Map<K, List<E>> map, E element) =>
-          map..putIfAbsent(keyFunction(element), () => <E>[]).add(element));
 }

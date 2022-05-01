@@ -14,8 +14,9 @@ void main() async {
   Client client = Client();
   Account account = Account(client);
 
-  client.setEndpoint("http://localhost:9001/v1");
-  client.setProject("625f79c9998e1dc9548e");
+  client.setEndpoint(
+      "http://8080-b14cknc0d3-devbook-oxjjf47frf6.ws-us43.gitpod.io/v1");
+  client.setProject("626bf9d15135604e68ce");
   document.body?.children
       .removeWhere((element) => element.className == "loader");
   if (param.containsKey("userId") || param.containsKey("secret")) {

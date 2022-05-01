@@ -32,6 +32,7 @@ class Room {
   late DateTime updatedAt;
   String? $id;
   late String roomId;
+  late String? lastMessage;
 
   Room({
     required this.fromUser,
@@ -42,6 +43,7 @@ class Room {
     required this.fromUserProfile,
     required this.toUserProfile,
     this.$id,
+    this.lastMessage,
     // required this.roomId,
   });
 
@@ -54,7 +56,7 @@ class Room {
     updatedAt = DateTime.parse(map['updatedAt']);
     fromUserProfile = Profile.fromMap(jsonDecode(map['from_user_profile']));
     toUserProfile = Profile.fromMap(jsonDecode(map['to_user_profile']));
-
+    lastMessage = map['last_message'];
     $id = map['\$id'];
   }
 

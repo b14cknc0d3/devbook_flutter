@@ -28,6 +28,7 @@ class SignUpController extends GetxController with StateMixin<User> {
 
   Future<void> doSignUp() async {
     if (formKey.currentState!.validate()) {
+      
       if (passwordController.text.trim() !=
           confirmPasswordController.text.trim()) {
         //snackbar

@@ -7,6 +7,7 @@ import 'package:devbook/src/ui/profile/get_all_profile_binding.dart';
 import 'package:devbook/src/widgets/circle_avator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ChatPage extends StatelessWidget {
@@ -79,10 +80,15 @@ class ChatPage extends StatelessWidget {
                           ? room.toUserProfile.profileImage.toString()
                           : room.fromUserProfile.profileImage.toString(),
                     ),
-                    title: Text(isOwnerOfRoom
-                        ? room.toUserProfile.user!.name
-                        : room.fromUserProfile.user!.name),
-                    subtitle: const Text(""),
+                    title: Text(
+                        isOwnerOfRoom
+                            ? room.toUserProfile.user!.name
+                            : room.fromUserProfile.user!.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        )),
+                    subtitle: Text(room.lastMessage ?? ""),
                     trailing: Text(timeago.format(room.createdAt)),
                   );
                 },

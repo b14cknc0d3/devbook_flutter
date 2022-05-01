@@ -13,7 +13,7 @@ class AppWriteClientController extends GetxController {
   void onInit() {
     client.setEndpoint(AppConstant.endpoint);
     client.setProject(AppConstant.projectId);
-    client.setSelfSigned();
+    client.setSelfSigned(status: true);
     database = Database(client);
     realtime = Realtime(client);
     account = Account(client);

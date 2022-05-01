@@ -36,7 +36,7 @@ class LoginController extends GetxController with StateMixin<User> {
     if (formKey.currentState!.validate()) {
       // change(null, status: RxStatus.loading());
       try {
-        // change(null, status: RxStatus.loading());
+        change(null, status: RxStatus.loading());
         //doLogin
         final response = await appWriteController.account!.createSession(
           email: emailController.text.trim(),
@@ -53,21 +53,10 @@ class LoginController extends GetxController with StateMixin<User> {
         final data3 = Map<String, dynamic>.from(data2['data']);
         final Profile profile = Profile.fromMap(data3);
 
-        // await appWriteController.account!.createVerification(url: 'http://localhost:9001/verify');
-
-        // final Profile profile = Profile(
-        //     id: response.$id,
-        //     userId: response.userId,
-        //     email: response.providerUid,
-        //     country: response.countryName,
-        //     userName: user.name,
-        //     createdAt: DateTime.now(),
-        //     updatedAt: DateTime.now());
-
         authController.saveUserdata(profile, user, response);
+
         Get.offAllNamed(
           MyRoutes.home,
-        
         );
         // testCreateProfile(profile, response);
 
@@ -82,6 +71,4 @@ class LoginController extends GetxController with StateMixin<User> {
       //snackbar
     }
   }
-
-  
 }

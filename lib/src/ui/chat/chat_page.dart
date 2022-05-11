@@ -89,7 +89,7 @@ class ChatPage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         )),
                     subtitle: Text(room.lastMessage ?? ""),
-                    trailing: Text(timeago.format(room.createdAt)),
+                    trailing: Text(timeago.format(room.updatedAt)),
                   );
                 },
               ));

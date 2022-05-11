@@ -80,7 +80,6 @@ class ChatController extends GetxController {
         //   return x;
         // });
         .listen((event) {
-          print(event.toMap());
           Message x = Message.fromMap(event.payload);
           if (x.roomId == room.roomId) {
             log("[TOTAL_MESSAGE] =>  ${_conversationListRx.length}");
@@ -187,7 +186,7 @@ class ChatController extends GetxController {
           'last_message': message.message.length > 255
               ? message.message.substring(0, 255)
               : message.message,
-          'updatedAt': DateTime.now().toIso8601String(),
+          'updatedAt': DateTime.now().toUtc().toIso8601String(),
         },
       );
       // getMessageByRoom(message.roomId);

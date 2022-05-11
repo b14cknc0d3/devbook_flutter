@@ -1,6 +1,6 @@
 class AppConstant {
   // static String endpoint = 'http://localhost:9001/v1';
-  static String endpoint = "https://172.104.188.52/v1";
+  static String endpoint = "http://172.104.188.52/v1";
   // static String projectId = '625f79c9998e1dc9548e';
   static String projectId = '626bf9d15135604e68ce';
   static String postCollectionId = '626cee0f17c1928455a2';

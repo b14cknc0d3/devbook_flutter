@@ -17,7 +17,7 @@ class MyTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool obsureText = false;
+    bool obsureText = isPassword;
     return StatefulBuilder(builder: (context, setState) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),

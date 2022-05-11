@@ -28,7 +28,6 @@ class SignUpController extends GetxController with StateMixin<User> {
 
   Future<void> doSignUp() async {
     if (formKey.currentState!.validate()) {
-      
       if (passwordController.text.trim() !=
           confirmPasswordController.text.trim()) {
         //snackbar
@@ -47,8 +46,9 @@ class SignUpController extends GetxController with StateMixin<User> {
             email: emailController.text.trim(),
             password: passwordController.text.trim(),
           );
+          // will not work now
           await appWriteClientController.account!
-              .createVerification(url: 'http://localhost:8080/');
+              .createVerification(url: 'http://172.104.188.52:9000/');
 
           await appWriteClientController.database!.createDocument(
               collectionId: AppConstant.profileCollectionId,

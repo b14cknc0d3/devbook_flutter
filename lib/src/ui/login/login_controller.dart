@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:appwrite/models.dart';
 import 'package:devbook/src/api/appwrite_client.dart';
 import 'package:devbook/src/constant/constant.dart';
@@ -62,7 +60,7 @@ class LoginController extends GetxController with StateMixin<User> {
 
         change(user, status: RxStatus.success());
       } catch (e) {
-        log(e.toString());
+        mySnackBar(e.toString(), true);
         change(null, status: RxStatus.error(e.toString()));
         throw Exception(e);
       }

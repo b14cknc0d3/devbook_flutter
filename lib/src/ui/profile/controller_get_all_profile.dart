@@ -23,8 +23,11 @@ class GetAllProfileController extends GetxController {
       final res = await appWriteClientController.database!.listDocuments(
           collectionId: AppConstant.profileCollectionId,
           queries: [
-            // Query.notEqual('id', Get.find<AuthController>().user!.$id),
-            Query.equal('verified', true)
+            Query.notEqual('id', Get.find<AuthController>().user!.$id),
+            //TODO EMAIL VERIFICATION NEEDED
+            ///linode ban smpt port
+            ///
+            // Query.equal('verified', true)
           ]);
       print(res.toMap());
       profileList = ProfileDocumentList.fromMap(res).data;

@@ -4,7 +4,7 @@ import 'package:appwrite/models.dart';
 import 'package:devbook/src/api/appwrite_client.dart';
 import 'package:devbook/src/constant/constant.dart';
 import 'package:devbook/src/controller/auth/auth_controller.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../model/post.dart';
@@ -18,12 +18,9 @@ class CreatePostController extends GetxController with StateMixin<String> {
       Get.find<AppWriteClientController>();
   createPost() async {
     try {
-      // Post post = Post(
-      //   author: Get.find<AuthController>().user?.$id,
-      //   body: textEditingController.text.trim(),
-      //   updatedAt: DateTime.now(),
-      //   createdAt: DateTime.now(),
-      // );
+      if (textEditingController.text.isEmpty) {
+        return;
+      }
       Post post = Post.fromMap(<String, dynamic>{
         'author': jsonEncode(Get.find<AuthController>().profile!.toMap()),
         'body': textEditingController.text.trim(),
@@ -31,13 +28,22 @@ class CreatePostController extends GetxController with StateMixin<String> {
         'createdAt': DateTime.now().toUtc().toString(),
       });
 
-      await appWriteClientController.database!.createDocument(
-        collectionId: AppConstant.postCollectionId,
-        documentId: AppConstant.docId,
-        data: post.toMap(),
-        read: ['role:member'],
-        write: ['user:${Get.find<AuthController>().user!.$id}'],
-        // write: ['role:member']
+      Get.showOverlay(
+        asyncFunction: () async {
+          await appWriteClientController.database!.createDocument(
+            collectionId: AppConstant.postCollectionId,
+            documentId: AppConstant.docId,
+            data: post.toMap(),
+            read: ['role:member'],
+            write: ['user:${Get.find<AuthController>().user!.$id}'],
+            // write: ['role:member']
+          ).then((value) => Get.back());
+        },
+        loadingWidget: Container(
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
       );
     } catch (e) {
       throw Exception(e);
